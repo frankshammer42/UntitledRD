@@ -1,0 +1,23 @@
+{
+  "name": "physarumrelatedgrowth",
+  "version": "0.0.0",
+  "description": "R&D for organic growth > physarum growth implement by nicolas barradeau",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "dat.gui": "0.7.5",
+    "file-loader": "^3.0.1",
+    "raw-loader": "^1.0.0",
+    "url-loader": "^4.1.0",
+    "three": "0.102.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "scripts": {
+    "dev": "webpack && webpack-dev-server",
+    "deploy": "webpack -p --config webpack.config.js"
+  },
+  "author": "Rui An",
+  "license": "ISC"
+}
