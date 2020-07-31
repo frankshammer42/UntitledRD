@@ -1,6 +1,8 @@
+uniform sampler2D guide_texture;
 uniform sampler2D input_texture;
 uniform sampler2D data;
 
+uniform float guideWeight;
 uniform vec2 currentMousePosition;
 uniform vec2 resolution;
 uniform float time;
@@ -8,7 +10,6 @@ uniform float sa;
 uniform float ra;
 uniform float so;
 uniform float ss;
-
 
 const float PI  = 3.14159265358979323846264;// PI
 const float PI2 = PI * 2.;
@@ -24,16 +25,13 @@ float getDataValue(vec2 uv){
 }
 
 float getTrailValue(vec2 uv){
-    return texture2D(data,fract(uv)).g;
+    vec4 guideValueCol = texture2D(guide_texture, fract(uv));
+    float guidVal = guideValueCol.r * 0.3 + guideValueCol.g * 0.59 + guideValueCol.b * 0.11;
+    return texture2D(data,fract(uv)).g + guidVal * guideWeight;
 }
 
 varying vec2 vUv;
 void main(){
-//	vec4 currentAgentData = texture2D(input_texture, vUv);
-//	vec2 diffVec = currentMousePosition - currentAgentData.xy;
-//	vec2 normlizedDiffVec = normalize(diffVec);
-//	vec2 newPos = -1. * normlizedDiffVec + currentAgentData.xy;
-
 	vec4 src = texture2D(input_texture, vUv);
 
 	//converts degree to radians (should be done on the CPU)
@@ -79,10 +77,10 @@ void main(){
     val.xy += offset;
 
     //condition from the paper : move only if the destination is free
-//     if( getDataValue(val.xy) == 1. ){
-//         val.xy = src.xy;
-//         angle = rand(val.xy+time) * PI2;
-//     }
+     if( getDataValue(val.xy) == 1. ){
+         val.xy = src.xy;
+         angle = rand(val.xy+time) * PI2;
+     }
 
     //warps the coordinates so they remains in the [0-1] interval
     val.xy = fract( val.xy );
