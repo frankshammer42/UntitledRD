@@ -1,7 +1,4 @@
-/*
-
- */
-
+//TODO: Refactor the image file
 import 'file-loader?name=[name].[ext]!./src/html/index.html';
 import {
     Scene,
@@ -18,8 +15,10 @@ import ComputeRender from "./src/ComputeRender"
 import ParticleRender from "./src/ParticleRender"
 import dat from "dat.gui";
 import Controls from "./src/Controls";
+import WebMidi from "webmidi";
 
 const luan = require('./img/jueshi.png');
+const firstSceneVid = require('./vids/wutever.mov');
 // document.body.style.cursor = 'none';
 // let mousePos = new Vector2(0,0);
 // document.onmousemove = (event) => {
@@ -74,6 +73,62 @@ let controls;
 
 let video;
 let videoTexture;
+
+// WebMidi.enable(function (err) {
+//     if (err) {
+//         console.log("WebMidi could not be enabled.", err);
+//     } else {
+//         console.log("WebMidi enabled!");
+//     }
+//     console.log(WebMidi.inputs);
+//     let input = WebMidi.inputs[0];
+//     // input.addListener('noteon', "all",
+//     //     function (e) {
+//     //
+//     //     }
+//     // );
+//     input.addListener('controlchange', "all",
+//         function (e) {
+//             // console.log(e);
+//             let scale;
+//             let value;
+//             switch (e.controller.number){
+//                 case 3:
+//                     scale = e.data[2]/127;
+//                     value = scale * 10;
+//                     agents.material.uniforms.guideWeight.value = value;
+//                     break;
+//                 case 9:
+//                     scale = e.data[2]/127;
+//                     updateAgentsMat.uniforms.sa.value = scale * 90;
+//                     break;
+//                 case 12:
+//                     scale = e.data[2]/127;
+//                     value = scale * 90;
+//                     updateAgentsMat.uniforms.ra.value = value;
+//                     break;
+//                 case 13:
+//                     scale = e.data[2]/127;
+//                     value = scale*90;
+//                     updateAgentsMat.uniforms.so.value = value;
+//                     break;
+//                 case 14:
+//                     scale = e.data[2]/127;
+//                     value = scale*10;
+//                     updateAgentsMat.uniforms.ss.value = value;
+//                     // console.log(value);
+//                     break;
+//                 case 15:
+//                     scale = e.data[2]/127;
+//             }
+//         }
+//     );
+// });
+
+function onClick(){
+    console.log("Make Video Play");
+    video.play();
+}
 
 function createFBO(){
     trails = new ComputeRender(w, h, trailRenderMat);
@@ -205,7 +260,7 @@ function initPhysarum(imageData, imageTexture){
     controls.count = 50;
     start = Date.now();
     time = 0;
-    initPhysarumControl();
+ 	initPhysarumControl();
 }
 
 function getImageTexture(){
@@ -240,13 +295,17 @@ function init(){
         alpha: true
     });
     document.body.appendChild(renderer.domElement);
+    window.addEventListener("click", function(event) {
+        onClick();
+    });
     renderer.setSize(w, h);
     scene = new Scene();
     camera = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 100);
     camera.position.z = 1;
     getImageTexture();
     video = document.getElementById( 'video' );
-    initWebCam();
+    video.src = firstSceneVid;
+    // initWebCam();
     videoTexture = new VideoTexture( video );
 }
 

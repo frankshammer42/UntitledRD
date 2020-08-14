@@ -18,8 +18,8 @@ module.exports = {
             use: 'raw-loader'
         },
         {
-            test: /\.(jpe?g|png|gif|svg)$/i,
-            loader: ['file-loader']
+            test: /\.(mov|mp4|jpe?g|png|gif|svg)$/i,
+            loader: ['file-loader'],
         }
         ]
     },
