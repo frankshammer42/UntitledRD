@@ -133,7 +133,7 @@ let firstScenePhysarumPlay = true;
 function onClick(){
     console.log("Make Video Play");
     video.play();
-    // setTimeout(initWebCam, 10000);
+	 setTimeout(initWebCam, 100000);
 }
 
 function createFBO(){
