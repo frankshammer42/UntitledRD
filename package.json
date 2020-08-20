@@ -4,7 +4,7 @@
   "description": "R&D for organic growth > physarum growth implement by nicolas barradeau",
   "main": "index.js",
   "dependencies": {
-    "webmidi": "^2.5.1"
+    "webmidi": "^2.5.1",
     "dat.gui": "0.7.5",
     "file-loader": "^3.0.1",
     "raw-loader": "^1.0.0",
