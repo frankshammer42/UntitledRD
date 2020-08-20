@@ -31,7 +31,7 @@
   "scripts": {
     "dev": "webpack && webpack-dev-server",
     "deploy": "webpack -p --config webpack.config.js",
-	"start": "npm run dev"
+	"start":  "webpack && webpack-dev-server --port $PORT --host 0.0.0.0"
   },
   "author": "Rui An",
   "license": "ISC"
