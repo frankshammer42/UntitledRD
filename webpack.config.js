@@ -20,6 +20,10 @@ module.exports = {
         {
             test: /\.(mov|mp4|jpe?g|png|gif|svg)$/i,
             loader: ['file-loader'],
+        },
+        {
+            test: /\.css$/i,
+            use: ['style-loader', 'css-loader']
         }
         ]
     },

@@ -1,5 +1,6 @@
 //TODO: Refactor the image file
 import 'file-loader?name=[name].[ext]!./src/html/index.html';
+import css from './src/main.css';
 import {
     Scene,
     OrthographicCamera,
@@ -18,7 +19,7 @@ import Controls from "./src/Controls";
 import WebMidi from "webmidi";
 
 const luan = require('./img/jueshi.png');
-const firstSceneVid = require('./vids/wutever.mov');
+const firstSceneVid = require('./vids/NewYork.mp4');
 // document.body.style.cursor = 'none';
 // let mousePos = new Vector2(0,0);
 // document.onmousemove = (event) => {
@@ -74,6 +75,10 @@ let controls;
 let video;
 let videoTexture;
 
+//Scene Related variables
+let firstScenePhysarumPlay = true;
+
+
 // WebMidi.enable(function (err) {
 //     if (err) {
 //         console.log("WebMidi could not be enabled.", err);
@@ -128,6 +133,7 @@ let videoTexture;
 function onClick(){
     console.log("Make Video Play");
     video.play();
+    // setTimeout(initWebCam, 10000);
 }
 
 function createFBO(){
@@ -207,7 +213,7 @@ function initPhysarumControl(){
     gui.add(controls, "count", 1, size*size, 1);
 }
 
-function initPhysarum(imageData, imageTexture){
+function initPhysarum(){
     size = 1024;  // particles amount = ( size ^ 2 )
     count = size * size;
     pos = new Float32Array(count * 3);
@@ -229,7 +235,6 @@ function initPhysarum(imageData, imageTexture){
 
         let x = i % size;
         let y = ~~(i / size);
-        let pixel = getPixel(imageData, x, y);
         //In here we import the data
         // if (pixel.r !== 0){
         //     ptexdata[id++] = u; // normalized pos x
@@ -302,11 +307,12 @@ function init(){
     scene = new Scene();
     camera = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 100);
     camera.position.z = 1;
-    getImageTexture();
+    // getImageTexture();
     video = document.getElementById( 'video' );
     video.src = firstSceneVid;
     // initWebCam();
     videoTexture = new VideoTexture( video );
+    initPhysarum();
 }
 
 function renderPhysarum(){
@@ -324,7 +330,7 @@ function renderPhysarum(){
 }
 
 function animate(){
-    if (physarumInitialized){
+    if (firstScenePhysarumPlay){
         renderPhysarum();
     }
     renderer.setSize(w,h);
@@ -335,5 +341,3 @@ function animate(){
 
 init();
 animate();
-
-
