@@ -5,6 +5,16 @@
   "main": "index.js",
   "dependencies": {
     "webmidi": "^2.5.1"
+    "dat.gui": "0.7.5",
+    "file-loader": "^3.0.1",
+    "raw-loader": "^1.0.0",
+    "url-loader": "^4.1.0",
+    "css-loader": "^4.2.1",
+    "style-loader": "^1.2.1",
+    "three": "0.102.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "devDependencies": {
     "dat.gui": "0.7.5",
