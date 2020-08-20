@@ -20,8 +20,8 @@
   },
   "scripts": {
     "dev": "webpack && webpack-dev-server",
-    "start": "webpack && webpack-dev-server",
-    "deploy": "webpack -p --config webpack.config.js"
+    "deploy": "webpack -p --config webpack.config.js",
+	"start": "npm run dev"
   },
   "author": "Rui An",
   "license": "ISC"
