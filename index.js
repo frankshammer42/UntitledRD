@@ -23,7 +23,7 @@ import Controls from "./src/Controls";
 
 const luan = require('./img/jueshi.png');
 const firstSceneVid = require('./vids/first.mp4');
-const thirdSceneVid = require('./vids/thrid.mp4');
+const thirdSceneVid = require('./vids/third.mp4');
 
 import TWEEN from "@tweenjs/tween.js";
 
@@ -73,7 +73,8 @@ let sceneState = 0;
 let firstScenePhysarumPlay = false;
 let thirdScenePlaying = false;
 let thirdSceneStartTime = 0;
-let thirdSceneSwitchStamps = [5, 10, 20];
+
+let thirdSceneSwitchStamps = [10, 32];
 let thirdSceneSwitchStampIndex = 0;
 
 // We can make it purely random
@@ -84,7 +85,6 @@ let forthSceneSwitchVidIndex = [0, 1, 2, 1, 0, 2, 0, 1, 2, 1];
 let forthScenePlaying = false;
 let forthSceneStartTime = 0;
 let forthSceneSwitchStampIndex = 0;
-
 
 
 //gui
@@ -147,17 +147,46 @@ let thirdSceneGroupVal = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "gu
 //     );
 // });
 
-function tweenCamParameters(start, target){
-    console.log("Function is called");
+function sceneFourCutGenerate(){
+    let numberOfCuts = 20;
+    let prevTime = 0;
+    forthSceneSwitchStamps = [];
+    for (let i=0; i<numberOfCuts; i++){
+        let cutAdd = 1 + Math.random();
+        let currentTime = cutAdd + prevTime;
+        forthSceneSwitchStamps.push(currentTime);
+        prevTime = currentTime;
+        if (i < numberOfCuts - 1){
+            if (i === 0){
+                let cutIndex = Math.floor(Math.random() * 3);
+                forthSceneSwitchVidIndex.push(cutIndex);
+            }
+            else{
+                let prevIndex = forthSceneSwitchVidIndex[i-1];
+                let currentIndex = Math.floor(Math.random() * 3);
+                while (currentIndex === prevIndex){
+                    currentIndex = Math.floor(Math.random() * 3);
+                }
+                forthSceneSwitchVidIndex.push(currentIndex);
+            }
+        }
+        else{
+            forthSceneSwitchVidIndex.push(1);
+        }
+    }
+    console.log(forthSceneSwitchStamps);
+    console.log(forthSceneSwitchVidIndex);
+}
+
+function tweenCamParameters(start, target, time){
     let currentCamParam = Object.assign({}, start);
-    let camParamTWEEN = new TWEEN.Tween(currentCamParam).to(target, 4000).easing(TWEEN.Easing.Quadratic.InOut)
+    let camParamTWEEN = new TWEEN.Tween(currentCamParam).to(target, time).easing(TWEEN.Easing.Quadratic.InOut)
         .onUpdate(()=>{
             console.log("wtf");
             console.log(currentCamParam);
             updateSceneParameter(currentCamParam);
         })
         .onComplete(()=>{
-            console.log("videFinsihed");
             videoFinished();
         })
         .start();
@@ -305,7 +334,7 @@ function initPhysarum(){
     controls.count = 50;
     start = Date.now();
     time = 0;
- 	initPhysarumControl();
+ 	// initPhysarumControl();
 }
 
 function initWebCam(){
@@ -360,7 +389,7 @@ function videoFinished(){
     if (sceneState === 0){
         sceneState += 1;
         initWebCam();
-        tweenCamParameters(firstSceneGroupVal, thirdSceneGroupVal);
+        tweenCamParameters(firstSceneGroupVal, thirdSceneGroupVal, 40000);
         updateAgentsMat.uniforms.guide_texture.value = videoWebCamTexture;
     }
     else if (sceneState === 1){
@@ -388,7 +417,28 @@ function videoFinished(){
         thirdScenePlaying = false;
         forthSceneStartTime = Date.now()/1000;
         forthScenePlaying = true;
+        console.log("start to make chose");
+        let forthSceneGroupVal = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 50, "ss":8, "guideWeight": 10};
+        tweenCamParameters(thirdSceneGroupVal, forthSceneGroupVal, 50000);
     }
+    else if (sceneState === 3){
+        let current = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 50, "ss":8, "guideWeight": 10};
+        let target = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
+        sceneState += 1;
+        tweenCamParameters(current, target,  20000);
+    }
+    else if (sceneState === 4){
+        let current = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
+        let target = {"decay": 0.0,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
+        tweenCamParameters(current, target,  20000);
+        sceneState += 1;
+    }
+    else if (sceneState === 5){
+        console.log("jump");
+    }
+
+
+
 }
 
 function init(){
@@ -423,6 +473,7 @@ function init(){
 
     textureSArray = [videoFirstTexture, videoWebCamTexture, videoThirdTexture];
 
+    sceneFourCutGenerate();
 
     initPhysarum();
     updateSceneParameter(firstSceneGroupVal);
@@ -450,8 +501,8 @@ function animate(){
             let currentTime  = Date.now()/1000;
             if (thirdSceneSwitchStampIndex < thirdSceneSwitchStamps.length){
                 if (currentTime - thirdSceneStartTime > thirdSceneSwitchStamps[thirdSceneSwitchStampIndex]){
-                    console.log("cam Switch");
-                    // thirdSceneCamSwitch();
+                    console.log("third cam Switch");
+                    thirdSceneCamSwitch();
                     thirdSceneSwitchStampIndex += 1;
                 }
             }
@@ -466,11 +517,7 @@ function animate(){
                 }
             }
             else{
-                console.log("finsihed");
                 forthScenePlaying = false;
-                let target = {"decay": 0.0,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 1};
-                let current = thirdSceneGroupVal;
-                tweenCamParameters(current, target);
             }
         }
 
