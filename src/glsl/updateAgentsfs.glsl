@@ -26,7 +26,7 @@ float getDataValue(vec2 uv){
 
 float getTrailValue(vec2 uv){
     vec4 guideValueCol = texture2D(guide_texture, fract(uv));
-    float guidVal = guideValueCol.r * 0.3 + guideValueCol.g * 0.59 + guideValueCol.b * 0.11;
+    float guidVal = guideValueCol.r * 0.3 + guideValueCol.g * 0.11 + guideValueCol.b * 0.59;
     return texture2D(data,fract(uv)).g + guidVal * guideWeight;
 }
 

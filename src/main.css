@@ -12,8 +12,8 @@ html, body {
     text-align: center;
 }
 
-#video {
-    filter:opacity(0%);
+.video {
+    /*filter:opacity(0%);*/
     position: absolute;
     width: 100%;
     height: 100%;
@@ -21,3 +21,14 @@ html, body {
     text-align: center;
     display:none;
 }
+
+#Prompt {
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    width: 100%;
+    height: 100%;
+    color: white;
+    font-size: 44pt;
+}
+

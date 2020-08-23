@@ -11,10 +11,10 @@ export default class Controls {
         this.radius = .01;
         this.count = 200;
         let container = renderer.domElement;
-        container.addEventListener("mouseup", this.onUp.bind(this));
-        container.addEventListener("mousedown", this.onDown.bind(this));
-        container.addEventListener("mousemove", this.onMove.bind(this));
-        container.addEventListener("dblclick", this.onDoubleClick.bind(this));
+        // container.addEventListener("mouseup", this.onUp.bind(this));
+        // container.addEventListener("mousedown", this.onDown.bind(this));
+        // container.addEventListener("mousemove", this.onMove.bind(this));
+        // container.addEventListener("dblclick", this.onDoubleClick.bind(this));
     }
 
     onDown(e) {

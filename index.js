@@ -1,4 +1,8 @@
 //TODO: Refactor the image file
+//TODO: Loading Screen?
+// TODO: Change webcam order
+
+
 import 'file-loader?name=[name].[ext]!./src/html/index.html';
 import css from './src/main.css';
 import {
@@ -16,33 +20,12 @@ import ComputeRender from "./src/ComputeRender"
 import ParticleRender from "./src/ParticleRender"
 import dat from "dat.gui";
 import Controls from "./src/Controls";
-import WebMidi from "webmidi";
 
 const luan = require('./img/jueshi.png');
-const firstSceneVid = require('./vids/NewYork.mp4');
-// document.body.style.cursor = 'none';
-// let mousePos = new Vector2(0,0);
-// document.onmousemove = (event) => {
-//     let mouseX = event.clientX / innerWidth;
-//     let mouseY = event.clientX / innerHeight;
-//     mousePos = new Vector2(mouseX, mouseY);
-// };
-//
-// let elem = document.body;
-// function openFullscreen() {
-//     if (elem.requestFullscreen) {
-//         elem.requestFullscreen();
-//     } else if (elem.mozRequestFullScreen) { /* Firefox */
-//         elem.mozRequestFullScreen();
-//     } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-//         elem.webkitRequestFullscreen();
-//     } else if (elem.msRequestFullscreen) { /* IE/Edge */
-//         elem.msRequestFullscreen();
-//     }
-// }
-// document.body.onmousedown = function() {
-//     openFullscreen();
-// };
+const firstSceneVid = require('./vids/scene01.mp4');
+const thirdSceneVid = require('./vids/c5.mp4');
+
+import TWEEN from "@tweenjs/tween.js";
 
 let scene;
 let camera;
@@ -72,11 +55,35 @@ let finalRenderMesh;
 
 let controls;
 
-let video;
-let videoTexture;
+// Video Related vars
+let videoFirst;
+let videoFirstTexture;
+let videoWebCam;
+let videoWebCamTexture;
+let videoThird;
+let videoThirdTexture;
+
+
+
+
+
 
 //Scene Related variables
-let firstScenePhysarumPlay = true;
+//TODO: We Need to have loading for the videos
+let sceneState = 0;
+let firstScenePhysarumPlay = false;
+let thirdScenePlaying = false;
+let thirdSceneStartTime = 0;
+let thirdSceneSwitchStamps = [5, 50, 90];
+let thirdSceneSwitchStampIndex = 0;
+
+//gui
+let gui;
+
+//parameters for scenes group
+let firstSceneGroupVal = {"decay": 0.9,  "sa": 7.6, "ra": 8.5, "so": 1, "ss":0.1, "guideWeight": 10};
+// let secondSceneGroupVal = {"decay": 0.9,  "sa": 4, "ra": 4, "so": 8, "ss":8, "guideWeight": 10};
+let thirdSceneGroupVal = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
 
 
 // WebMidi.enable(function (err) {
@@ -130,10 +137,53 @@ let firstScenePhysarumPlay = true;
 //     );
 // });
 
+function tweenCamParameters(){
+    console.log("Function is called");
+    let currentCamParam = Object.assign({}, firstSceneGroupVal);
+    let camParamTWEEN = new TWEEN.Tween(currentCamParam).to(thirdSceneGroupVal, 10000).easing(TWEEN.Easing.Quadratic.InOut)
+        .onUpdate(()=>{
+            console.log("wtf");
+            console.log(currentCamParam);
+            updateSceneParameter(currentCamParam);
+        })
+        .onComplete(()=>{
+            console.log("videFinsihed");
+            videoFinished();
+        })
+        .start();
+}
+
+function getPixel( imagedata, x, y ) {
+    let position = ( x + imagedata.width * y ) * 4, data = imagedata.data;
+    return { r: data[ position ], g: data[ position + 1 ], b: data[ position + 2 ], a: data[ position + 3 ] };
+}
+
+function getImageTexture(){
+    imageData = null;
+    let imgTexture = new TextureLoader().load(luan, (result)=>{
+        gotImageData = true;
+        imageData = getImageData( result.image );
+        initPhysarum(imageData, result);
+        physarumInitialized = true;
+    });
+}
+
+function getImageData( image ) {
+    let canvas = document.createElement( 'canvas' );
+    canvas.width = image.width;
+    canvas.height = image.height;
+    let context = canvas.getContext( '2d' );
+    context.drawImage( image, 0, 0 );
+    return context.getImageData( 0, 0, image.width, image.height );
+}
+
 function onClick(){
-    console.log("Make Video Play");
-    video.play();
-	 setTimeout(initWebCam, 100000);
+    if (sceneState === 0){
+        document.getElementById("Prompt").hidden = true;
+        videoFirst.play();
+        firstScenePhysarumPlay = true;
+    }
+    // setTimeout(initWebCam, 100000);
 }
 
 function createFBO(){
@@ -160,10 +210,10 @@ function createMat(){
             sa: { value: 2 },
             ra: { value: 4 },
             so: { value: 12 },
-            ss: { value: 1.1 },
+            ss: { value: 8},
             currentMousePosition: {value: new Vector2(0, 0)},
             guide_texture: {value: null},
-            guideWeight: {value: 0}
+            guideWeight: {value: 10}
         },
         vertexShader: require('./src/glsl/quadvs.glsl'),
         fragmentShader: require('./src/glsl/updateAgentsfs.glsl')
@@ -179,29 +229,16 @@ function createMat(){
         uniforms: {
             data: {
                 value: null
-            }
+            },
+            guide_texture:{value: null}
         },
         vertexShader: require('./src/glsl/quadvs.glsl'),
         fragmentShader: require('./src/glsl/finalRender.glsl')
     });
 }
 
-function getImageData( image ) {
-    let canvas = document.createElement( 'canvas' );
-    canvas.width = image.width;
-    canvas.height = image.height;
-    let context = canvas.getContext( '2d' );
-    context.drawImage( image, 0, 0 );
-    return context.getImageData( 0, 0, image.width, image.height );
-}
-
-function getPixel( imagedata, x, y ) {
-    let position = ( x + imagedata.width * y ) * 4, data = imagedata.data;
-    return { r: data[ position ], g: data[ position + 1 ], b: data[ position + 2 ], a: data[ position + 3 ] };
-}
-
 function initPhysarumControl(){
-    let gui = new dat.GUI();
+    gui = new dat.GUI();
     gui.add(trailRenderMat.uniforms.decay, "value", 0.01, .99, .01).name("decay");
     gui.add(updateAgentsMat.uniforms.sa, "value", 1, 90, .1).name("sa");
     gui.add(updateAgentsMat.uniforms.ra, "value", 1, 90, .1).name("ra");
@@ -211,6 +248,17 @@ function initPhysarumControl(){
     gui.add(controls, "random");
     gui.add(controls, "radius", .001,.25);
     gui.add(controls, "count", 1, size*size, 1);
+}
+
+function randomNumberInCircle(radius){
+    let randomRadius = radius * Math.random();
+    let randomAngle =  Math.random() * 2 * Math.PI;
+    let x = randomRadius * Math.cos(randomAngle);
+    let y = randomRadius * Math.sin(randomAngle);
+    y *= window.innerWidth / window.innerHeight;
+    x += 0.5;
+    y += 0.5;
+    return [x,y];
 }
 
 function initPhysarum(){
@@ -248,6 +296,9 @@ function initPhysarum(){
         //     ptexdata[id++] = 1; // normalized angle
         //     ptexdata[id++] = 1
         // }
+        // let circlePoints = randomNumberInCircle(0.1);
+        // ptexdata[id++] = circlePoints[0]; // normalized pos x
+        // ptexdata[id++] = circlePoints[1]; // normalized pos y
         ptexdata[id++] = Math.random(); // normalized pos x
         ptexdata[id++] = Math.random(); // normalized pos y
         ptexdata[id++] = 1; // normalized angle
@@ -259,7 +310,8 @@ function initPhysarum(){
         trailRenderMat, updateAgentsMat
     ];
     let resolution = new Vector2(w,h);
-    updateAgentsMat.uniforms.guide_texture.value = videoTexture;
+    updateAgentsMat.uniforms.guide_texture.value = videoFirstTexture;
+    // finalRenderMat.uniforms.guide_texture.value = videoTexture;
     materials.forEach( (mat)=>{mat.uniforms.resolution.value = resolution});
     controls = new Controls(renderer, agents);
     controls.count = 50;
@@ -268,28 +320,64 @@ function initPhysarum(){
  	initPhysarumControl();
 }
 
-function getImageTexture(){
-    imageData = null;
-    let imgTexture = new TextureLoader().load(luan, (result)=>{
-        gotImageData = true;
-        imageData = getImageData( result.image );
-        initPhysarum(imageData, result);
-        physarumInitialized = true;
-    });
-}
-
 function initWebCam(){
     if ( navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
         let constraints = { video: { width: 1280, height: 720, facingMode: 'user' } };
         navigator.mediaDevices.getUserMedia( constraints ).then( function ( stream ) {
             // apply the stream to the video element used in the texture
-            video.srcObject = stream;
-            video.play();
+            videoWebCam.srcObject = stream;
+            videoWebCam.play();
         } ).catch( function ( error ) {
             console.error( 'Unable to access the camera/webcam.', error );
         } );
     } else {
         console.error( 'MediaDevices interface not available.' );
+    }
+}
+
+
+function updateSceneParameter(sceneParameter){
+    trailRenderMat.uniforms.decay.value = sceneParameter.decay;
+    updateAgentsMat.uniforms.sa.value = sceneParameter.sa;
+    updateAgentsMat.uniforms.ra.value = sceneParameter.ra;
+    updateAgentsMat.uniforms.so.value = sceneParameter.so;
+    updateAgentsMat.uniforms.ss.value = sceneParameter.ss;
+    updateAgentsMat.uniforms.guideWeight.value = sceneParameter.guideWeight;
+}
+
+function thirdSceneSwitchCircle(time){
+    let initialSwitchTime = time;
+    setTimeout(()=>{
+        updateAgentsMat.uniforms.guide_texture.value = videoWebCamTexture;
+        setTimeout(() => {
+            updateAgentsMat.uniforms.guide_texture.value = videoThirdTexture;
+        }, 2000);
+    }, initialSwitchTime);
+}
+
+
+function thirdSceneCamSwitch(){
+    let initialSwitchTime = 1000;
+    thirdSceneSwitchCircle(initialSwitchTime);
+    // thirdSceneSwitchCircle(initialSwitchTime + 5000);
+    // thirdSceneSwitchCircle(initialSwitchTime + 9000);
+}
+
+
+function videoFinished(){
+    console.log("Video Finished");
+    if (sceneState === 0){
+        sceneState += 1;
+        initWebCam();
+        tweenCamParameters();
+        updateAgentsMat.uniforms.guide_texture.value = videoWebCamTexture;
+    }
+    else if (sceneState === 1){
+        videoThird.play();
+        updateAgentsMat.uniforms.guide_texture.value = videoThirdTexture;
+        sceneState += 1;
+        thirdScenePlaying = true;
+        thirdSceneStartTime = Date.now()/1000;
     }
 }
 
@@ -308,11 +396,24 @@ function init(){
     camera = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 100);
     camera.position.z = 1;
     // getImageTexture();
-    video = document.getElementById( 'video' );
-    video.src = firstSceneVid;
-    // initWebCam();
-    videoTexture = new VideoTexture( video );
+
+    videoFirst = document.getElementById( 'first' );
+    videoFirst.src = firstSceneVid;
+    videoFirst.addEventListener("ended", videoFinished, false);
+    videoFirstTexture = new VideoTexture( videoFirst );
+
+    videoWebCam = document.getElementById( 'second' );
+    videoWebCam.src = firstSceneVid;
+    videoWebCamTexture = new VideoTexture( videoWebCam );
+
+    videoThird = document.getElementById( 'third' );
+    videoThird.src = thirdSceneVid;
+    videoThird.addEventListener("ended", videoFinished, false);
+    videoThirdTexture = new VideoTexture( videoThird );
+
+
     initPhysarum();
+    updateSceneParameter(firstSceneGroupVal);
 }
 
 function renderPhysarum(){
@@ -332,6 +433,18 @@ function renderPhysarum(){
 function animate(){
     if (firstScenePhysarumPlay){
         renderPhysarum();
+        TWEEN.update();
+        if (thirdScenePlaying){
+            let currentTime  = Date.now()/1000;
+            console.log(currentTime - thirdSceneStartTime);
+            if (thirdSceneSwitchStampIndex < thirdSceneSwitchStamps.length){
+                if (currentTime - thirdSceneStartTime > thirdSceneSwitchStamps[thirdSceneSwitchStampIndex]){
+                    console.log("cam Switch");
+                    thirdSceneCamSwitch();
+                    thirdSceneSwitchStampIndex += 1;
+                }
+            }
+        }
     }
     renderer.setSize(w,h);
     renderer.clear();
