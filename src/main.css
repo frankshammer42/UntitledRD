@@ -12,6 +12,19 @@ html, body {
     text-align: center;
 }
 
+a:link {
+    color: rgba(255, 255, 255, 0.4);
+    background-color: transparent;
+    text-decoration: none;
+}
+
+a:visited {
+    color: rgba(255, 255, 255, 0.4);
+    background-color: transparent;
+    text-decoration: none;
+}
+
+
 .video {
     /*filter:opacity(0%);*/
     position: absolute;
@@ -20,6 +33,18 @@ html, body {
     margin: 0 auto;
     text-align: center;
     display:none;
+}
+
+#sequenceTitle {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    color: white;
+    font-family: "Crimson Pro";
+    top: 50%;
+
 }
 
 #Prompt {

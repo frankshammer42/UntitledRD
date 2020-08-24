@@ -206,6 +206,7 @@ function onClick(){
         videoSoundTrack.play();
         console.log("wtf?");
         firstScenePhysarumPlay = true;
+        changeTitle("I: Etherial Rumor");
     }
     // setTimeout(initWebCam, 100000);
 }
@@ -378,6 +379,15 @@ function thirdSceneSwitchCircle(time){
     }, initialSwitchTime);
 }
 
+
+function changeTitle(title){
+    let sequenceTitle = document.getElementById("sequenceTitle");
+    sequenceTitle.innerHTML = title;
+    setTimeout(()=>{
+        sequenceTitle.innerHTML = "";
+    },  3000);
+}
+
 function thirdSceneCamSwitch(){
     let initialSwitchTime = 1000;
     thirdSceneSwitchCircle(initialSwitchTime);
@@ -388,18 +398,19 @@ function thirdSceneCamSwitch(){
 function forthSceneCamSwitch(){
     let videoIndex =  forthSceneSwitchVidIndex[forthSceneSwitchStampIndex];
     updateAgentsMat.uniforms.guide_texture.value = textureSArray[videoIndex];
-
 }
 
 function videoFinished(){
     console.log("Video Finished");
     if (sceneState === 0){
+        changeTitle("II: The Witness");
         sceneState += 1;
         initWebCam();
         tweenCamParameters(firstSceneGroupVal, thirdSceneGroupVal, 40000);
         updateAgentsMat.uniforms.guide_texture.value = videoWebCamTexture;
     }
     else if (sceneState === 1){
+        changeTitle("III: Prison, Palace And Reverberation");
         videoThird.play();
         updateAgentsMat.uniforms.guide_texture.value = videoThirdTexture;
         sceneState += 1;
@@ -407,6 +418,7 @@ function videoFinished(){
         thirdSceneStartTime = Date.now()/1000;
     }
     else if (sceneState === 2){
+        changeTitle("IV: Rapid Eye Movement");
         videoFirst.currentTime = 0;
         videoThird.currentTime = 0;
         videoFirst.play();
@@ -437,11 +449,12 @@ function videoFinished(){
     else if (sceneState === 4){
         let current = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
         let target = {"decay": 0.0,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
+        changeTitle("V: Remembrance");
         tweenCamParameters(current, target,  20000);
         sceneState += 1;
     }
     else if (sceneState === 5){
-        console.log("jump");
+        window.location.href = "https://ikarusfilmabout.herokuapp.com";
     }
 
 }
