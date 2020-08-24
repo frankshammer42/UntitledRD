@@ -206,7 +206,7 @@ function onClick(){
         videoSoundTrack.play();
         console.log("wtf?");
         firstScenePhysarumPlay = true;
-        changeTitle("I: Etherial Rumor");
+        changeTitle("I: Etherial Rumors");
     }
     // setTimeout(initWebCam, 100000);
 }
@@ -443,13 +443,13 @@ function videoFinished(){
     else if (sceneState === 3){
         let current = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 50, "ss":8, "guideWeight": 10};
         let target = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
+        changeTitle("V: Remembrance");
         sceneState += 1;
         tweenCamParameters(current, target,  20000);
     }
     else if (sceneState === 4){
         let current = {"decay": 0.9,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
         let target = {"decay": 0.0,  "sa": 2, "ra": 4, "so": 12, "ss":8, "guideWeight": 10};
-        changeTitle("V: Remembrance");
         tweenCamParameters(current, target,  20000);
         sceneState += 1;
     }
