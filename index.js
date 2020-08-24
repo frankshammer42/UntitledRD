@@ -2,7 +2,6 @@
 //TODO: Loading Screen?
 // TODO: Change webcam order
 
-
 import 'file-loader?name=[name].[ext]!./src/html/index.html';
 import css from './src/main.css';
 import {
@@ -24,6 +23,8 @@ import Controls from "./src/Controls";
 const luan = require('./img/jueshi.png');
 const firstSceneVid = require('./vids/first.mp4');
 const thirdSceneVid = require('./vids/third.mp4');
+const backgroundSound = require('./vids/soundtrackVid.mp4');
+
 
 import TWEEN from "@tweenjs/tween.js";
 
@@ -63,8 +64,9 @@ let videoWebCamTexture;
 let videoThird;
 let videoThirdTexture;
 
-let textureSArray = [];
+let videoSoundTrack;
 
+let textureSArray = [];
 
 
 //Scene Related variables
@@ -79,13 +81,14 @@ let thirdSceneSwitchStampIndex = 0;
 
 // We can make it purely random
 let forthSceneSwitchStamps = [5, 7, 10, 12, 18, 20, 25, 29, 31, 32];
-let forthSceneSwitchVidIndex = [0, 1, 2, 1, 0, 2, 0, 1, 2, 1];
+let forthSceneSwitchVidIndex = [];
 
 
 let forthScenePlaying = false;
 let forthSceneStartTime = 0;
 let forthSceneSwitchStampIndex = 0;
 
+// let backgroundMusic = new Audio(backgroundSound);
 
 //gui
 let gui;
@@ -194,10 +197,14 @@ function tweenCamParameters(start, target, time){
 
 function onClick(){
     if (sceneState === 0){
-        document.getElementById("center").hidden = true;
-        document.getElementById("require").hidden = true;
-        document.getElementById("menubar").hidden = true;
+        if (document.getElementById("center") !== null){
+            document.getElementById("center").hidden = true;
+            document.getElementById("require").hidden = true;
+            document.getElementById("menubar").hidden = true;
+        }
         videoFirst.play();
+        videoSoundTrack.play();
+        console.log("wtf?");
         firstScenePhysarumPlay = true;
     }
     // setTimeout(initWebCam, 100000);
@@ -437,8 +444,6 @@ function videoFinished(){
         console.log("jump");
     }
 
-
-
 }
 
 function init(){
@@ -457,6 +462,9 @@ function init(){
     camera.position.z = 1;
     // getImageTexture();
 
+    videoSoundTrack = document.getElementById( 'soundTrack' );
+    videoSoundTrack.src = backgroundSound;
+
     videoFirst = document.getElementById( 'first' );
     videoFirst.src = firstSceneVid;
     videoFirst.addEventListener("ended", videoFinished, false);
@@ -465,6 +473,7 @@ function init(){
     videoWebCam = document.getElementById( 'second' );
     videoWebCam.src = firstSceneVid;
     videoWebCamTexture = new VideoTexture( videoWebCam );
+    initWebCam();
 
     videoThird = document.getElementById( 'third' );
     videoThird.src = thirdSceneVid;

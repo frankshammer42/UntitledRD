@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const index = "index";
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: './'+index+'.js',
@@ -24,6 +25,10 @@ module.exports = {
         {
             test: /\.css$/i,
             use: ['style-loader', 'css-loader']
+        },
+        {
+            test: /\.(ogg|mp3|wav|mpe?g)$/i,
+            loader: ['file-loader'],
         }
         ]
     },
