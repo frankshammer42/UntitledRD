@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "R&D for organic growth > physarum growth implement by nicolas barradeau",
   "main": "index.js",
-  "engines": {
-    "node": "20.x"
-  },
   "dependencies": {
     "html-webpack-plugin": "^4.3.0",
     "@tweenjs/tween.js": "^18.6.0",
