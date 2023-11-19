@@ -4,7 +4,7 @@
   "description": "R&D for organic growth > physarum growth implement by nicolas barradeau",
   "main": "index.js",
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "dependencies": {
     "html-webpack-plugin": "^4.3.0",
