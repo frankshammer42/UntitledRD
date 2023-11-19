@@ -87,8 +87,10 @@ a:visited {
     height: 100%;
     color: white;
     font-size: 15pt;
-    font-style: italic;
+    /*font-style: italic;*/
+    letter-spacing: 0.3rem;
     font-family: 'Crimson Pro';
+    cursor: pointer;
 }
 
 #watch {
