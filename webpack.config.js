@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './'+index+'.js',
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'public'),
         filename: index + '.js'
     },
     module: {
@@ -41,7 +41,7 @@ module.exports = {
         ignored: "/node_modules/"
     },
     devServer: {
-        contentBase: path.join(__dirname, 'build'),
+        contentBase: path.join(__dirname, 'public'),
         compress: true,
         port: 3000 
     },
