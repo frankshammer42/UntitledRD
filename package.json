@@ -34,7 +34,7 @@
   "scripts": {
     "start": "./node_modules/webpack/bin/webpack.js -p --progress && node server.js",
     "dev": "webpack && webpack-dev-server",
-    "build": "./node_modules/webpack/bin/webpack.js -p --progress"
+    "build": "webpack -p --config webpack.config.js"
   },
   "author": "Rui An",
   "license": "ISC"
