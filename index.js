@@ -454,7 +454,7 @@ function videoFinished(){
         sceneState += 1;
     }
     else if (sceneState === 5){
-        window.location.href = "https://ikarus-about-8t8ugv3dt-frankshammer42.vercel.app/";
+        window.location.href = "https://ikarus-about.vercel.app/";
     }
 
 }
