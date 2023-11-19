@@ -34,7 +34,7 @@
   "scripts": {
     "start": "./node_modules/webpack/bin/webpack.js -p --progress && node server.js",
     "dev": "webpack && webpack-dev-server",
-    "build": "webpack -p --config webpack.config.js"
+    "build": "SET NODE_OPTIONS=--openssl-legacy-provider webpack -p --config webpack.config.js"
   },
   "author": "Rui An",
   "license": "ISC"
